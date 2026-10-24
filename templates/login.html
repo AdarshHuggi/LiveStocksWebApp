@@ -15,6 +15,9 @@
         <div class="auth-form-box">
           <p class="eyebrow text-primary">Welcome back</p>
           <h2>Login to your account</h2>
+          {% if success %}
+            <div class="alert alert-success mt-3">{{ success }}</div>
+          {% endif %}
           {% if error %}
             <div class="alert alert-danger mt-3">{{ error }}</div>
           {% endif %}

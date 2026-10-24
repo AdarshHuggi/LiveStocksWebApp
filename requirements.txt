@@ -4,6 +4,6 @@ sqlalchemy
 pydantic
 jinja2
 python-multipart
-passlib[bcrypt]
+bcrypt>=4.0.1,<6
 email-validator
 python-dotenv

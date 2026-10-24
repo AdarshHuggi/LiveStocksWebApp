@@ -126,11 +126,15 @@ def home(request: Request, db: Session = Depends(get_db)):
 
 
 @app.get("/login")
-def login_page(request: Request, db: Session = Depends(get_db)):
+def login_page(request: Request, registered: bool = False, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
     if user:
         return RedirectResponse("/dashboard", status_code=303)
-    return templates.TemplateResponse(request=request, name="login.html", context={"user": None, "error": None})
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html",
+        context={"user": None, "error": None, "success": "Account created successfully. You can now log in." if registered else None},
+    )
 
 
 @app.post("/login")
@@ -180,8 +184,16 @@ def register_submit(
             status_code=400,
         )
 
-    create_user(db, email=email, password=password, role="investor", full_name=full_name.strip())
-    return RedirectResponse("/login", status_code=303)
+    try:
+        create_user(db, email=email, password=password, role="investor", full_name=full_name.strip())
+    except ValueError as exc:
+        return templates.TemplateResponse(
+            request=request,
+            name="register.html",
+            context={"user": None, "error": str(exc)},
+            status_code=400,
+        )
+    return RedirectResponse("/login?registered=true", status_code=303)
 
 
 @app.get("/logout")
