@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Register | LiveStocks{% endblock %}
+{% block title %}Register | PashuNivesh{% endblock %}
 
 {% block content %}
 <section class="auth-page">
@@ -13,7 +13,7 @@
       </div>
       <div class="col-lg-6 auth-form-wrap">
         <div class="auth-form-box">
-          <p class="eyebrow text-primary">New investor</p>
+          <p class="eyebrow text-primary">Join PashuNivesh</p>
           <h2>Create an account</h2>
           {% if error %}
             <div class="alert alert-danger mt-3">{{ error }}</div>
@@ -30,6 +30,13 @@
             <div class="mb-3">
               <label for="password" class="form-label">Password</label>
               <input type="password" class="form-control" id="password" name="password" placeholder="Create a strong password" required />
+            </div>
+            <div class="mb-3">
+              <label for="role" class="form-label">I want to join as</label>
+              <select class="form-select" id="role" name="role" required>
+                <option value="investor">Investor</option>
+                <option value="farm_owner">Farm owner</option>
+              </select>
             </div>
             <button type="submit" class="btn btn-primary w-100">Create account</button>
           </form>

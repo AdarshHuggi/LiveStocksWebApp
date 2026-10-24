@@ -1,8 +1,8 @@
-# FarmVest - Livestock Investment Platform
+# PashuNivesh - Livestock Investment Platform
 
 ## Overview
 
-FarmVest is a modern livestock investment platform that enables investors to purchase and invest in farm animals while earning profits from offspring production and livestock growth.
+PashuNivesh is a modern livestock investment platform that enables investors to purchase and invest in farm animals while earning profits from offspring production and livestock growth.
 
 The platform connects:
 
@@ -208,7 +208,7 @@ Dark Text
 
 ## Platform Name
 
-FarmVest
+PashuNivesh
 
 Alternative Names
 

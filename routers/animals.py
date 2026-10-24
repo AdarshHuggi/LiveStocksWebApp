@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from database.database import SessionLocal
 from exceptions.custom import BusinessRuleError
-from models.models import Animal, BirthHistory, Farm, Investment
+from models.models import Animal, BirthHistory, Farm, Investment, User
 from schemas.animal import AnimalCreate, AnimalRead, AnimalUpdate, BirthRecordCreate, BirthRecordRead
 
 router = APIRouter(prefix="/api/animals", tags=["animals"])
@@ -19,6 +19,14 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def require_admin(request: Request, db: Session) -> User:
+    user_id = request.session.get("user_id")
+    user = db.query(User).filter(User.id == user_id).first() if user_id else None
+    if not user or user.role != "admin":
+        raise HTTPException(status_code=403, detail="Administrator access is required")
+    return user
 
 
 @router.get("/", response_model=list[AnimalRead])
@@ -35,7 +43,8 @@ def get_animal(animal_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=AnimalRead, status_code=status.HTTP_201_CREATED)
-def create_animal(payload: AnimalCreate, db: Session = Depends(get_db)):
+def create_animal(payload: AnimalCreate, request: Request, db: Session = Depends(get_db)):
+    require_admin(request, db)
     farm = db.query(Farm).filter(Farm.id == payload.farm_id).first()
     if not farm:
         raise HTTPException(status_code=404, detail="Farm not found")
@@ -44,12 +53,15 @@ def create_animal(payload: AnimalCreate, db: Session = Depends(get_db)):
         tag_number=payload.tag_number,
         animal_type=payload.animal_type,
         name=payload.name,
+        breed=payload.breed,
         gender=payload.gender,
         age_months=payload.age_months,
+        weight_kg=payload.weight_kg,
+        description=payload.description,
+        image_url=payload.image_url,
         purchase_price=payload.purchase_price,
         market_value=payload.market_value,
         farm_id=payload.farm_id,
-        owner_id=payload.owner_id,
     )
     db.add(animal)
     db.commit()
@@ -58,7 +70,8 @@ def create_animal(payload: AnimalCreate, db: Session = Depends(get_db)):
 
 
 @router.patch("/{animal_id}", response_model=AnimalRead)
-def update_animal(animal_id: int, payload: AnimalUpdate, db: Session = Depends(get_db)):
+def update_animal(animal_id: int, payload: AnimalUpdate, request: Request, db: Session = Depends(get_db)):
+    require_admin(request, db)
     animal = db.query(Animal).filter(Animal.id == animal_id).first()
     if not animal:
         raise HTTPException(status_code=404, detail="Animal not found")
@@ -72,7 +85,8 @@ def update_animal(animal_id: int, payload: AnimalUpdate, db: Session = Depends(g
 
 
 @router.post("/{animal_id}/births", response_model=BirthRecordRead)
-def record_birth(animal_id: int, payload: BirthRecordCreate, db: Session = Depends(get_db)):
+def record_birth(animal_id: int, payload: BirthRecordCreate, request: Request, db: Session = Depends(get_db)):
+    require_admin(request, db)
     animal = db.query(Animal).filter(Animal.id == animal_id).first()
     if not animal:
         raise HTTPException(status_code=404, detail="Animal not found")
@@ -113,7 +127,8 @@ def list_births(animal_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{animal_id}/disable")
-def deactivate_animal(animal_id: int, db: Session = Depends(get_db)):
+def deactivate_animal(animal_id: int, request: Request, db: Session = Depends(get_db)):
+    require_admin(request, db)
     animal = db.query(Animal).filter(Animal.id == animal_id).first()
     if not animal:
         raise HTTPException(status_code=404, detail="Animal not found")

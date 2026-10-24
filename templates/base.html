@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}FarmVest | Livestock investing{% endblock %}</title>
+    <title>{% block title %}PashuNivesh | Livestock investing{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -16,7 +16,7 @@
       <div class="container">
         <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
           <span class="brand-mark"><i class="fa-solid fa-cow"></i></span>
-          <span>FarmVest</span>
+          <span>PashuNivesh</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
           <span class="navbar-toggler-icon"></span>
@@ -26,6 +26,7 @@
             <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
             <li class="nav-item"><a class="nav-link" href="/animals">Marketplace</a></li>
             <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+            {% if user %}<li class="nav-item"><a class="nav-link" href="/profile">My profile</a></li><li class="nav-item"><a class="nav-link" href="/farm/animals">List animals</a></li>{% if user.role == 'admin' %}<li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>{% endif %}{% else %}<li class="nav-item"><a class="nav-link" href="/admin/login">Admin login</a></li>{% endif %}
             <li class="nav-item"><a class="nav-link" href="/support">Support</a></li>
           </ul>
           <div class="d-flex align-items-center gap-3">
@@ -49,7 +50,7 @@
           <div class="col-md-6">
             <div class="d-flex align-items-center gap-2 fw-bold">
               <span class="brand-mark small"><i class="fa-solid fa-cow"></i></span>
-              <span>FarmVest</span>
+              <span>PashuNivesh</span>
             </div>
             <p class="mt-3 mb-0 text-secondary">Smart livestock investment for a more resilient food future.</p>
           </div>

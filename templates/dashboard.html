@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard | LiveStocks{% endblock %}
+{% block title %}Dashboard | PashuNivesh{% endblock %}
 
 {% block content %}
 <section class="page-hero small-hero">
   <div class="container">
-    <p class="eyebrow">Investor dashboard</p>
+    <p class="eyebrow">Your PashuNivesh dashboard</p>
     <h1>Welcome back, {{ user.full_name or user.email.split('@')[0] }}</h1>
+    <div class="d-flex flex-wrap gap-2 mt-4">
+      <a class="btn btn-primary" href="/animals">Browse investments</a><a class="btn btn-outline-light" href="/profile">View profile & portfolio</a><a class="btn btn-outline-light" href="/farm/animals">Add or manage animals</a>
+    </div>
   </div>
 </section>
 
@@ -61,8 +64,8 @@
               {% for investment in investments %}
                 <li class="list-group-item">
                   <div class="d-flex justify-content-between align-items-center">
-                    <span>Animal ID: {{ investment.animal_id }}</span>
-                    <strong>${{ '%.2f'|format(investment.amount_invested) }}</strong>
+                    <span>{{ investment.animal.name }} · {{ investment.animal.tag_number }}</span>
+                    <strong>₹{{ '%.0f'|format(investment.amount_invested) }}</strong>
                   </div>
                 </li>
               {% endfor %}

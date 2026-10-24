@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}My profile | PashuNivesh{% endblock %}
+
+{% block content %}
+<section class="page-hero small-hero">
+  <div class="container">
+    <p class="eyebrow">Account profile · {{ user.role|replace('_', ' ')|title }}</p>
+    <h1>{{ user.full_name or user.email.split('@')[0] }}</h1>
+    <p class="text-white-50 mb-0">Account #{{ user.id }} · {{ user.email }}</p>
+  </div>
+</section>
+
+<section class="dashboard-section">
+  <div class="container">
+    {% if success %}<div class="alert alert-success">Payment captured and your investment is recorded.</div>{% endif %}
+    <div class="row g-4 mb-4">
+      <div class="col-md-4"><div class="dashboard-card accent-green"><span>Investor ID</span><h3>#{{ user.id }}</h3></div></div>
+      <div class="col-md-4"><div class="dashboard-card accent-gold"><span>Active investments</span><h3>{{ investments|length }}</h3></div></div>
+      <div class="col-md-4"><div class="dashboard-card accent-blue"><span>Total invested</span><h3>₹{{ '%.0f'|format(total_invested) }}</h3></div></div>
+    </div>
+
+    <div class="panel-box mb-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+        <div><h4 class="mb-1">Your investment portfolio</h4><p class="text-secondary mb-0">Investment records are linked to investor ID #{{ user.id }}.</p></div>
+        <a class="btn btn-primary" href="/animals">Browse available animals</a>
+      </div>
+      {% if investments %}
+      <div class="table-responsive"><table class="table align-middle">
+        <thead><tr><th>Animal</th><th>Farm / owner</th><th>Investor ID</th><th>Purchase date</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody>{% for investment in investments %}
+          <tr>
+            <td><strong>{{ investment.animal.name }}</strong><br><small class="text-secondary">{{ investment.animal.animal_type }}{% if investment.animal.breed %} · {{ investment.animal.breed }}{% endif %} · Tag {{ investment.animal.tag_number }}</small></td>
+            <td>{{ investment.animal.farm.name }}<br><small class="text-secondary">{{ investment.animal.farm.owner.full_name or investment.animal.farm.owner.email }}</small></td>
+            <td>#{{ investment.investor_id }}</td>
+            <td>{{ investment.purchased_at.strftime('%d %b %Y') }}</td>
+            <td>₹{{ '%.0f'|format(investment.amount_invested) }}</td>
+            <td><span class="badge text-bg-success">Active</span></td>
+          </tr>
+        {% endfor %}</tbody>
+      </table></div>
+      {% else %}<div class="empty-state">You haven’t invested in an animal yet. Browse available listings to get started.</div>{% endif %}
+    </div>
+
+    <div class="panel-box">
+      <div class="d-flex justify-content-between align-items-center gap-3 mb-3"><div><h4 class="mb-1">Investment opportunities</h4><p class="text-secondary mb-0">Currently available animals from listed farms.</p></div><a href="/animals">View marketplace</a></div>
+      {% if available_animals %}<div class="row g-3">
+        {% for animal in available_animals %}
+        <div class="col-md-6 col-xl-4"><div class="opportunity-row"><div><strong>{{ animal.name }}</strong><div class="small text-secondary">{{ animal.animal_type }} · {{ animal.farm.name }}</div></div><strong>₹{{ '%.2f'|format(animal.market_value or animal.purchase_price) }}</strong><a class="btn btn-sm btn-outline-success" href="/animals">View & buy</a></div></div>
+        {% endfor %}
+      </div>{% else %}<div class="empty-state">There are no available listings right now.</div>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

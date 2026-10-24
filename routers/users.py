@@ -27,7 +27,7 @@ def register_user(payload: UserCreate, db: Session = Depends(get_db)):
         db,
         email=str(payload.email),
         password=payload.password,
-        role=payload.role,
+        role=payload.role if payload.role in {"investor", "farm_owner"} else "investor",
         full_name=payload.full_name,
     )
     return user

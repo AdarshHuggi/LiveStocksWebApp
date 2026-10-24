@@ -10,12 +10,15 @@ class AnimalBase(BaseModel):
     tag_number: str
     animal_type: str = Field(..., description="Goat, Sheep, Cow, Buffalo")
     name: str
+    breed: Optional[str] = None
     gender: str
     age_months: int = 0
+    weight_kg: Optional[float] = None
+    description: Optional[str] = None
+    image_url: Optional[str] = None
     purchase_price: float = 0.0
     market_value: float = 0.0
     farm_id: int
-    owner_id: Optional[int] = None
 
 
 class AnimalCreate(AnimalBase):
@@ -24,7 +27,11 @@ class AnimalCreate(AnimalBase):
 
 class AnimalUpdate(BaseModel):
     name: Optional[str] = None
+    breed: Optional[str] = None
     age_months: Optional[int] = None
+    weight_kg: Optional[float] = None
+    description: Optional[str] = None
+    image_url: Optional[str] = None
     market_value: Optional[float] = None
     is_available: Optional[bool] = None
     is_active: Optional[bool] = None
@@ -32,6 +39,8 @@ class AnimalUpdate(BaseModel):
 
 class AnimalRead(AnimalBase):
     id: int
+    investor_id: Optional[int] = None
+    farm_owner_name: Optional[str] = None
     purchased_at: datetime
     lock_until: Optional[datetime] = None
     is_available: bool

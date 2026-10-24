@@ -258,6 +258,23 @@ img {
 .marketplace-tools { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.8rem; padding: 1rem; border: 1px solid #edf1f3; border-radius: 20px; background: #fff; }
 .empty-state { padding: 2rem; border-radius: 20px; background: #fff; color: var(--muted); text-align: center; }
 .animal-result[hidden] { display: none !important; }
+.animal-owner { color: var(--brand-dark); font-size: 0.82rem; font-weight: 600; margin: -0.35rem 0 0.7rem; }
+.animal-description { color: var(--muted); font-size: 0.9rem; min-height: 2.7em; }
+.demo-note { display: block; color: var(--muted); font-size: 0.75rem; margin-top: 0.55rem; text-align: center; }
+.opportunity-row { display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem; align-items: center; height: 100%; padding: 1rem; border: 1px solid #edf1f3; border-radius: 16px; }
+.opportunity-row > strong { color: var(--brand-dark); white-space: nowrap; }
+.table { --bs-table-bg: transparent; }
+.admin-thumb { width: 54px; height: 42px; object-fit: cover; border-radius: 8px; margin-bottom: 0.25rem; }
+.admin-form-panel { max-width: 1000px; margin: 0 auto; }
+.admin-form-photo { display: block; width: 180px; height: 120px; border-radius: 12px; object-fit: cover; }
+.checkout-card { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr); max-width: 950px; margin: 0 auto; overflow: hidden; border: 1px solid #edf1f3; border-radius: 26px; background: #fff; box-shadow: var(--shadow); }
+.checkout-photo { width: 100%; height: 100%; min-height: 430px; object-fit: cover; }
+.checkout-summary { padding: clamp(1.5rem, 4vw, 3rem); }
+.checkout-summary h2 { margin: 0.35rem 0 1.5rem; color: var(--brand-dark); font-size: 2.4rem; font-weight: 800; }
+.checkout-summary dl { margin: 0 0 1.5rem; }
+.checkout-summary dl > div { display: flex; justify-content: space-between; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid #edf1f3; }
+.checkout-summary dt { color: var(--muted); font-weight: 500; }
+.checkout-summary dd { margin: 0; text-align: right; font-weight: 600; }
 
 .feature-item i {
   width: 60px;
@@ -557,4 +574,9 @@ img {
   .page-hero {
     padding: 70px 0;
   }
+}
+
+@media (max-width: 767.98px) {
+  .checkout-card { grid-template-columns: 1fr; }
+  .checkout-photo { min-height: 220px; max-height: 300px; }
 }

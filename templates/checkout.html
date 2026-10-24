@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Secure checkout | PashuNivesh{% endblock %}
+{% block content %}
+<section class="page-hero small-hero"><div class="container"><p class="eyebrow">Secure checkout</p><h1>Invest in {{ animal.name }}</h1><p class="text-white-50 mb-0">{{ animal.animal_type }} · {{ animal.breed or 'Livestock' }} · Tag {{ animal.tag_number }}</p></div></section>
+<section class="dashboard-section"><div class="container"><div class="checkout-card">
+  <div><img class="checkout-photo" src="{{ animal.image_url or 'https://images.unsplash.com/photo-1554284126-a5d0f3adca7f?auto=format&fit=crop&w=900&q=80' }}" alt="{{ animal.name }}"></div>
+  <div class="checkout-summary"><span class="text-secondary">Amount due</span><h2>₹{{ '%.2f'|format(amount_rupees) }}</h2><dl><div><dt>Animal</dt><dd>{{ animal.name }} · #{{ animal.id }}</dd></div><div><dt>Farm</dt><dd>{{ animal.farm.name }}</dd></div><div><dt>Farm owner</dt><dd>{{ animal.farm_owner_name }}</dd></div><div><dt>Investor</dt><dd>{{ user.full_name or user.email }} · #{{ user.id }}</dd></div></dl>
+    <p class="small text-secondary">Payment is processed by Razorpay. The one-year investment lock starts after the payment is captured and verified. PashuNivesh stores the provider payment reference with your investment.</p>
+    <button id="payButton" type="button" class="btn btn-primary w-100 btn-lg">Pay ₹{{ '%.2f'|format(amount_rupees) }}</button>
+    <p id="paymentMessage" class="small mt-3 mb-0" role="status"></p><a id="cancelCheckout" href="/animals" class="d-block text-center mt-3">Cancel and return to marketplace</a>
+  </div>
+</div></div></section>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const paymentId = {{ payment.id }};
+  let verifyingSuccess = false;
+  document.getElementById('cancelCheckout').addEventListener('click', function () {
+    fetch(`/payments/${paymentId}/cancel`, { method: 'POST', keepalive: true });
+  });
+  const options = {
+    key: {{ razorpay_key_id|tojson }},
+    amount: {{ payment.amount_paise }},
+    currency: {{ payment.currency|tojson }},
+    name: "PashuNivesh",
+    description: {{ ("Investment in " ~ animal.name)|tojson }},
+    order_id: {{ payment.provider_order_id|tojson }},
+    prefill: { name: {{ (user.full_name or "")|tojson }}, email: {{ user.email|tojson }} },
+    theme: { color: "#1f7a4d" },
+    handler: async function (response) {
+      verifyingSuccess = true;
+      const message = document.getElementById('paymentMessage');
+      message.textContent = 'Verifying your payment…';
+      try {
+        const result = await fetch('/payments/verify', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(response)
+        });
+        const data = await result.json();
+        if (!result.ok) throw new Error(data.error || 'Payment verification failed.');
+        window.location.href = data.redirect_url;
+      } catch (error) {
+        message.textContent = error.message;
+        message.classList.add('text-danger');
+      }
+    },
+    modal: { ondismiss: function () { if (!verifyingSuccess) fetch(`/payments/${paymentId}/cancel`, { method: 'POST' }); } }
+  };
+  document.getElementById('payButton').addEventListener('click', function () {
+    if (!window.Razorpay) {
+      document.getElementById('paymentMessage').textContent = 'Razorpay Checkout did not load. Check your connection and retry.';
+      return;
+    }
+    const checkout = new Razorpay(options);
+    checkout.on('payment.failed', function (response) {
+      fetch(`/payments/${paymentId}/cancel`, { method: 'POST' });
+      document.getElementById('paymentMessage').textContent = response.error.description || 'Payment failed. You can try again.';
+    });
+    checkout.open();
+  });
+</script>
+{% endblock %}

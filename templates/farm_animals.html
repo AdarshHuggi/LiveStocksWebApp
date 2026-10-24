@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Farm animal listings | PashuNivesh{% endblock %}
+
+{% block content %}
+<section class="page-hero small-hero"><div class="container"><p class="eyebrow">Farm owner tools</p><h1>Manage your livestock listings</h1><p class="lead text-white-50 mt-3 mb-0">Add animal details to make them available in the investor marketplace.</p></div></section>
+
+<section class="dashboard-section"><div class="container">
+  {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+  {% if success %}<div class="alert alert-success">{{ success }}</div>{% endif %}
+
+  {% if not farms %}
+  <div class="panel-box mb-4"><h4>Create your farm profile</h4><p class="text-secondary">A farm profile connects each animal listing with its owner and location.</p>
+    <form method="post" action="/farm/create" class="row g-3">
+      <div class="col-md-6"><label class="form-label" for="farmName">Farm name</label><input class="form-control" id="farmName" name="name" required maxlength="255"></div>
+      <div class="col-md-6"><label class="form-label" for="farmLocation">Location</label><input class="form-control" id="farmLocation" name="location" required maxlength="255" placeholder="District, State"></div>
+      <div class="col-12"><button class="btn btn-primary" type="submit">Create farm profile</button></div>
+    </form>
+  </div>
+  {% else %}
+  <div class="panel-box mb-4"><h4>Add an animal listing</h4><p class="text-secondary">The animal ID is generated automatically. The tag number must be unique across the platform.</p>
+    <form method="post" action="/farm/animals" class="row g-3">
+      <div class="col-md-6"><label class="form-label" for="farmId">Farm</label><select class="form-select" id="farmId" name="farm_id" required>{% for farm in farms %}<option value="{{ farm.id }}">{{ farm.name }} — {{ farm.location }}</option>{% endfor %}</select></div>
+      <div class="col-md-6"><label class="form-label" for="tagNumber">Unique animal tag</label><input class="form-control" id="tagNumber" name="tag_number" required maxlength="100" placeholder="e.g. PN-001"></div>
+      <div class="col-md-4"><label class="form-label" for="animalName">Animal name</label><input class="form-control" id="animalName" name="name" required maxlength="200"></div>
+      <div class="col-md-4"><label class="form-label" for="animalType">Type</label><select class="form-select" id="animalType" name="animal_type" required><option value="">Select type</option><option>Cow</option><option>Buffalo</option><option>Goat</option><option>Sheep</option><option>Other</option></select></div>
+      <div class="col-md-4"><label class="form-label" for="breed">Breed</label><input class="form-control" id="breed" name="breed" maxlength="120" placeholder="e.g. Sahiwal"></div>
+      <div class="col-md-3"><label class="form-label" for="gender">Gender</label><select class="form-select" id="gender" name="gender" required><option value="">Select gender</option><option value="female">Female</option><option value="male">Male</option></select></div>
+      <div class="col-md-3"><label class="form-label" for="ageMonths">Age (months)</label><input class="form-control" id="ageMonths" name="age_months" type="number" min="0" value="0" required></div>
+      <div class="col-md-3"><label class="form-label" for="weightKg">Weight (kg)</label><input class="form-control" id="weightKg" name="weight_kg" type="number" step="0.1" min="0" value="0" required></div>
+      <div class="col-md-3"><label class="form-label" for="marketValue">Investment price (₹)</label><input class="form-control" id="marketValue" name="market_value" type="number" step="1" min="1" required></div>
+      <input type="hidden" name="purchase_price" value="0">
+      <div class="col-md-6"><label class="form-label" for="imageUrl">Photo URL (optional)</label><input class="form-control" id="imageUrl" name="image_url" type="url" maxlength="500" placeholder="https://..."></div>
+      <div class="col-md-6"><label class="form-label" for="description">Description / health notes</label><input class="form-control" id="description" name="description" maxlength="1000" placeholder="Health, vaccination, or animal notes"></div>
+      <div class="col-12"><button class="btn btn-primary" type="submit">Publish animal listing</button></div>
+    </form>
+  </div>
+  {% endif %}
+
+  <div class="panel-box"><h4>Your animal records</h4>
+    {% if listed_animals %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Animal ID</th><th>Tag</th><th>Animal</th><th>Farm owner</th><th>Investor ID</th><th>Investment price</th><th>Listing</th></tr></thead><tbody>
+      {% for animal in listed_animals %}<tr><td>#{{ animal.id }}</td><td>{{ animal.tag_number }}</td><td>{{ animal.name }}<br><small class="text-secondary">{{ animal.animal_type }}{% if animal.breed %} · {{ animal.breed }}{% endif %}</small></td><td>{{ animal.farm_owner_name }}</td><td>{% if animal.investor_id %}#{{ animal.investor_id }}{% else %}—{% endif %}</td><td>₹{{ '%.0f'|format(animal.market_value or animal.purchase_price) }}</td><td>{% if animal.is_available and animal.is_active %}<span class="badge text-bg-success">Available</span>{% elif not animal.is_active %}<span class="badge text-bg-secondary">Inactive</span>{% else %}<span class="badge text-bg-light">Invested</span>{% endif %}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<div class="empty-state">No animal records yet. Create a farm profile, then add your first listing.</div>{% endif %}
+  </div>
+</div></section>
+{% endblock %}

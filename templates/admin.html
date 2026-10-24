@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Admin console | PashuNivesh{% endblock %}
+{% block content %}
+<section class="page-hero small-hero"><div class="container"><p class="eyebrow">Administrator</p><h1>Platform control center</h1><p class="text-white-50 mb-0">Manage animal listings, farms, and payment records.</p></div></section>
+<section class="dashboard-section"><div class="container">
+  {% if request.query_params.get('error') %}<div class="alert alert-danger">{{ request.query_params.get('error') }}</div>{% endif %}
+  {% if not payment_enabled %}<div class="alert alert-warning">Razorpay is not configured. Add the API key settings from the project setup instructions before accepting payments.</div>{% endif %}
+  <div class="row g-4 mb-4">
+    <div class="col-6 col-lg-3"><div class="dashboard-card accent-green"><span>Animal records</span><h3>{{ animal_count }}</h3></div></div>
+    <div class="col-6 col-lg-3"><div class="dashboard-card accent-gold"><span>Investors</span><h3>{{ investor_count }}</h3></div></div>
+    <div class="col-6 col-lg-3"><div class="dashboard-card accent-blue"><span>Investments</span><h3>{{ investment_count }}</h3></div></div>
+    <div class="col-6 col-lg-3"><div class="dashboard-card accent-green"><span>Pending payments</span><h3>{{ pending_payments }}</h3></div></div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-7"><div class="panel-box h-100"><div class="d-flex justify-content-between align-items-center mb-3"><div><h4 class="mb-1">Animal listings</h4><p class="text-secondary mb-0">Published listings appear in the investor marketplace.</p></div><a class="btn btn-primary" href="/admin/animals/new">Add animal</a></div>
+      {% if animals %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>ID / Photo</th><th>Animal</th><th>Farm owner</th><th>Investor</th><th>Amount</th><th>State</th><th></th></tr></thead><tbody>
+      {% for animal in animals %}<tr>
+        <td><img class="admin-thumb" src="{{ animal.image_url or 'https://images.unsplash.com/photo-1554284126-a5d0f3adca7f?auto=format&fit=crop&w=200&q=80' }}" alt="{{ animal.name }}"><small>#{{ animal.id }} · {{ animal.tag_number }}</small></td>
+        <td><strong>{{ animal.name }}</strong><br><small class="text-secondary">{{ animal.animal_type }}{% if animal.breed %} · {{ animal.breed }}{% endif %}</small></td>
+        <td>{{ animal.farm_owner_name }}</td><td>{% if animal.investor_id %}#{{ animal.investor_id }}{% else %}—{% endif %}</td>
+        <td>₹{{ '%.0f'|format(animal.market_value or animal.purchase_price) }}</td><td>{% if not animal.is_active %}Inactive{% elif animal.is_available %}Available{% else %}Invested / reserved{% endif %}</td>
+        <td><a class="btn btn-sm btn-outline-success" href="/admin/animals/{{ animal.id }}/edit">Edit</a>{% if animal.is_active %}<form class="d-inline" method="post" action="/admin/animals/{{ animal.id }}/deactivate" onsubmit="return confirm('Deactivate this listing?');"><button class="btn btn-sm btn-outline-danger" type="submit">Disable</button></form>{% endif %}</td>
+      </tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state">No animals yet. Create a farm below, then add the first animal.</div>{% endif %}
+    </div></div>
+    <div class="col-lg-5"><div class="panel-box h-100"><h4>Add a farm</h4><p class="text-secondary">Every animal listing belongs to a farm with an owner.</p>
+      <form method="post" action="/admin/farms" class="vstack gap-3">
+        <div><label class="form-label" for="farmName">Farm name</label><input class="form-control" id="farmName" name="name" required maxlength="255"></div>
+        <div><label class="form-label" for="farmLocation">Location</label><input class="form-control" id="farmLocation" name="location" required maxlength="255"></div>
+        <div><label class="form-label" for="farmOwner">Farm owner</label><select class="form-select" id="farmOwner" name="owner_id" required><option value="">Choose account</option>{% for account in users %}<option value="{{ account.id }}">{{ account.full_name or account.email }} · #{{ account.id }}</option>{% endfor %}</select></div>
+        <button class="btn btn-outline-success" type="submit">Create farm</button>
+      </form>
+      <hr><h5 class="mt-3">Farm records</h5>{% if farms %}<ul class="list-group list-group-flush">{% for farm in farms %}<li class="list-group-item d-flex justify-content-between"><span>{{ farm.name }}<small class="d-block text-secondary">{{ farm.owner.full_name or farm.owner.email }}</small></span><span class="small text-secondary">{{ farm.location }}</span></li>{% endfor %}</ul>{% else %}<p class="text-secondary mb-0">No farms registered.</p>{% endif %}
+    </div></div>
+  </div>
+
+  <div class="panel-box"><h4>Payment activity</h4><p class="text-secondary">Captured payments create investment records. Refund-required entries need to be refunded in Razorpay before marking them processed here.</p>
+    {% if payments %}<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Created</th><th>Investor</th><th>Animal</th><th>Amount</th><th>Order / payment</th><th>Payment status</th><th>Notes / action</th></tr></thead><tbody>
+      {% for payment in payments %}<tr><td>{{ payment.created_at.strftime('%d %b %Y %H:%M') }}</td><td>{{ payment.investor.full_name or payment.investor.email }} · #{{ payment.investor_id }}</td><td>{{ payment.animal.name }} · #{{ payment.animal_id }}</td><td>₹{{ '%.2f'|format(payment.amount_paise / 100) }}</td><td><small>{{ payment.provider_order_id }}<br>{{ payment.provider_payment_id or '—' }}</small></td><td><span class="badge {% if payment.status == 'paid' or payment.status == 'refunded' %}text-bg-success{% elif payment.status == 'refund_required' %}text-bg-danger{% else %}text-bg-secondary{% endif %}">{{ payment.status|replace('_', ' ')|title }}</span></td><td>{{ payment.failure_reason or '—' }}{% if payment.status == 'refund_required' %}<form class="mt-2" method="post" action="/admin/payments/{{ payment.id }}/mark-refunded" onsubmit="return confirm('Confirm the refund has already been processed in Razorpay?');"><button class="btn btn-sm btn-outline-danger" type="submit">Mark refund processed</button></form>{% endif %}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<div class="empty-state">No payments recorded.</div>{% endif %}
+  </div>
+</div></section>
+{% endblock %}

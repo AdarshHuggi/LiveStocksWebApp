@@ -36,30 +36,10 @@ def get_investment(investment_id: int, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=InvestmentRead, status_code=status.HTTP_201_CREATED)
 def create_investment(payload: InvestmentCreate, db: Session = Depends(get_db)):
-    animal = db.query(Animal).filter(Animal.id == payload.animal_id).first()
-    if not animal:
-        raise HTTPException(status_code=404, detail="Animal not found")
-
-    if not animal.is_available:
-        raise HTTPException(status_code=400, detail="Animal is not available for investment")
-
-    if animal.is_locked:
-        raise HTTPException(status_code=400, detail="Animal is locked and cannot be invested in")
-
-    investment = Investment(
-        investor_id=payload.investor_id,
-        animal_id=payload.animal_id,
-        amount_invested=payload.amount_invested,
-        ownership_percentage=payload.ownership_percentage,
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail="Investments must be created through the authenticated payment checkout.",
     )
-    animal.is_available = False
-    animal.owner_id = payload.investor_id
-    animal.lock_until = datetime.utcnow() + timedelta(days=365)
-
-    db.add(investment)
-    db.commit()
-    db.refresh(investment)
-    return investment
 
 
 @router.post("/{investment_id}/sell")

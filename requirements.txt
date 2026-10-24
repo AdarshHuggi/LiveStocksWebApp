@@ -7,3 +7,4 @@ python-multipart
 bcrypt>=4.0.1,<6
 email-validator
 python-dotenv
+razorpay

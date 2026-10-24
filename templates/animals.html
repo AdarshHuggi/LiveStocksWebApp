@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Marketplace | FarmVest{% endblock %}
+{% block title %}Marketplace | PashuNivesh{% endblock %}
 
 {% block content %}
 <section class="page-hero small-hero">
@@ -13,6 +13,7 @@
 
 <section class="featured-section pb-5">
   <div class="container">
+    {% if payment_error == 'not_configured' %}<div class="alert alert-warning">Online payments aren’t configured yet. Contact the administrator.</div>{% elif payment_error == 'gateway' %}<div class="alert alert-danger">The payment provider could not create an order. Please try again shortly.</div>{% endif %}
     <div class="marketplace-tools mb-4">
       <input class="form-control" id="animalSearch" type="search" placeholder="Search animal, breed, or tag" aria-label="Search livestock">
       <select class="form-select" id="speciesFilter" aria-label="Filter by species"><option value="">All species</option></select>
@@ -20,21 +21,33 @@
     </div>
     <div class="row g-4">
       {% for animal in animals %}
-      <div class="col-lg-4 col-md-6 animal-result" data-species="{{ animal.animal_type|lower }}" data-gender="{{ animal.gender|lower }}" data-search="{{ (animal.name ~ ' ' ~ animal.tag_number ~ ' ' ~ animal.animal_type)|lower }}">
+      <div class="col-lg-4 col-md-6 animal-result" data-species="{{ animal.animal_type|lower }}" data-gender="{{ animal.gender|lower }}" data-search="{{ (animal.name ~ ' ' ~ animal.tag_number ~ ' ' ~ animal.animal_type ~ ' ' ~ (animal.breed or ''))|lower }}">
         <div class="animal-card large-card">
-          <img src="https://images.unsplash.com/photo-1554284126-a5d0f3adca7f?auto=format&fit=crop&w=900&q=80" alt="{{ animal.name }}" />
+          <img src="{{ animal.image_url or 'https://images.unsplash.com/photo-1554284126-a5d0f3adca7f?auto=format&fit=crop&w=900&q=80' }}" alt="{{ animal.name }}" />
           <div class="animal-card-body">
             <div class="d-flex justify-content-between align-items-start">
               <h5>{{ animal.name }}</h5>
               <span class="tag">{{ animal.animal_type|title }}</span>
             </div>
-            <p class="meta">Tag #{{ animal.tag_number }} • {{ animal.gender|title }}</p>
+            <p class="meta">Tag #{{ animal.tag_number }} • {{ animal.gender|title }}{% if animal.breed %} • {{ animal.breed }}{% endif %}</p>
+            <p class="animal-owner">Farm owner: {{ animal.farm.owner.full_name or animal.farm.owner.email }} · {{ animal.farm.name }}</p>
+            {% if animal.description %}<p class="animal-description">{{ animal.description }}</p>{% endif %}
             <div class="price-row mb-0">
               <span>Investment amount</span>
-              <strong>₹{{ '%.0f'|format(animal.market_value or animal.purchase_price or 0) }}</strong>
+              <strong>₹{{ '%.2f'|format(animal.market_value or animal.purchase_price or 0) }}</strong>
             </div>
-            <div class="price-row"><span>Age</span><strong>{{ animal.age_months }} months</strong></div>
-            <a class="btn btn-primary w-100 mt-3" href="/register">Invest in this animal</a>
+            <div class="price-row"><span>Age / weight</span><strong>{{ animal.age_months }} mo{% if animal.weight_kg %} · {{ '%.1f'|format(animal.weight_kg) }} kg{% endif %}</strong></div>
+            {% if user and payment_enabled %}
+              <form method="post" action="/investments/{{ animal.id }}"><button class="btn btn-primary w-100 mt-3" type="submit">Buy for ₹{{ '%.2f'|format(animal.market_value or animal.purchase_price) }}</button></form>
+              <small class="demo-note">Secure checkout · 1 year investment lock</small>
+            {% elif user %}
+              <button class="btn btn-primary w-100 mt-3" type="button" disabled>Payments not configured</button>
+              <small class="demo-note">The administrator needs to configure Razorpay keys.</small>
+            {% elif not user %}
+              <a class="btn btn-primary w-100 mt-3" href="/login">Log in to invest</a>
+            {% else %}
+              <p class="demo-note mt-3 mb-0">Farm owner accounts can manage animal listings.</p>
+            {% endif %}
           </div>
         </div>
       </div>
