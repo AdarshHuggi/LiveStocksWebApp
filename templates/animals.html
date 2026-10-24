@@ -1,20 +1,26 @@
 {% extends "base.html" %}
 
-{% block title %}Animals | LiveStocks{% endblock %}
+{% block title %}Marketplace | FarmVest{% endblock %}
 
 {% block content %}
 <section class="page-hero small-hero">
   <div class="container">
     <p class="eyebrow">Browse livestock</p>
-    <h1>Available animals and investment opportunities</h1>
+    <h1>Find your next farm opportunity.</h1>
+    <p class="lead text-white-50 mt-3 mb-0">Explore livestock listed by farms and compare the details.</p>
   </div>
 </section>
 
 <section class="featured-section pb-5">
   <div class="container">
+    <div class="marketplace-tools mb-4">
+      <input class="form-control" id="animalSearch" type="search" placeholder="Search animal, breed, or tag" aria-label="Search livestock">
+      <select class="form-select" id="speciesFilter" aria-label="Filter by species"><option value="">All species</option></select>
+      <select class="form-select" id="genderFilter" aria-label="Filter by gender"><option value="">Any gender</option><option value="female">Female</option><option value="male">Male</option></select>
+    </div>
     <div class="row g-4">
       {% for animal in animals %}
-      <div class="col-lg-4 col-md-6">
+      <div class="col-lg-4 col-md-6 animal-result" data-species="{{ animal.animal_type|lower }}" data-gender="{{ animal.gender|lower }}" data-search="{{ (animal.name ~ ' ' ~ animal.tag_number ~ ' ' ~ animal.animal_type)|lower }}">
         <div class="animal-card large-card">
           <img src="https://images.unsplash.com/photo-1554284126-a5d0f3adca7f?auto=format&fit=crop&w=900&q=80" alt="{{ animal.name }}" />
           <div class="animal-card-body">
@@ -23,19 +29,19 @@
               <span class="tag">{{ animal.animal_type|title }}</span>
             </div>
             <p class="meta">Tag #{{ animal.tag_number }} • {{ animal.gender|title }}</p>
-            <div class="price-row">
-              <span>Purchase value</span>
-              <strong>${{ '%.2f'|format(animal.purchase_price or 0) }}</strong>
-            </div>
             <div class="price-row mb-0">
-              <span>Market value</span>
-              <strong>${{ '%.2f'|format(animal.market_value or 0) }}</strong>
+              <span>Investment amount</span>
+              <strong>₹{{ '%.0f'|format(animal.market_value or animal.purchase_price or 0) }}</strong>
             </div>
+            <div class="price-row"><span>Age</span><strong>{{ animal.age_months }} months</strong></div>
+            <a class="btn btn-primary w-100 mt-3" href="/register">Invest in this animal</a>
           </div>
         </div>
       </div>
       {% endfor %}
     </div>
+    {% if animals %}<p id="noAnimalsFound" class="empty-state mt-4" hidden>No animals match those filters. Try a different search.</p>{% endif %}
+    {% if not animals %}<div class="empty-state mt-4">There are no livestock listings yet. Please check back soon.</div>{% endif %}
   </div>
 </section>
 {% endblock %}

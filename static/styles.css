@@ -198,6 +198,8 @@ img {
 .feature-strip,
 .featured-section,
 .story-section,
+.how-section,
+.calculator-section,
 .support-section,
 .dashboard-section,
 .page-hero {
@@ -212,6 +214,50 @@ img {
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.04);
   text-align: center;
 }
+
+.how-section {
+  padding: 80px 0;
+  background: #f8faf5;
+}
+
+.how-section .section-heading { max-width: 650px; }
+.how-section .section-heading .eyebrow { background: #eaf4ec; color: var(--brand-dark) !important; }
+
+.step-card {
+  padding: 1.5rem;
+  border: 1px solid #e7eee8;
+  border-radius: 22px;
+  background: #fff;
+}
+
+.step-number {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  margin-bottom: 1.2rem;
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+  font-weight: 800;
+}
+
+.step-card h3 { font-size: 1.1rem; font-weight: 700; }
+.step-card p { margin: 0; color: var(--muted); line-height: 1.65; }
+
+.calculator-section { padding: 80px 0; }
+.calculator-card { overflow: hidden; border: 1px solid #e8eee9; border-radius: 28px; background: #fff; box-shadow: var(--shadow); }
+.calculator-copy, .calculator-form { padding: clamp(1.5rem, 4vw, 3rem); }
+.calculator-copy { background: #f8faf5; }
+.calculator-copy .eyebrow { background: #eaf4ec; color: var(--brand-dark) !important; }
+.calculator-copy h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); letter-spacing: -0.04em; }
+.calculator-result { display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding-top: 1rem; border-top: 1px solid #e8eee9; color: var(--muted); }
+.calculator-result strong { color: var(--brand-dark); font-size: 1.5rem; }
+
+.marketplace-tools { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.8rem; padding: 1rem; border: 1px solid #edf1f3; border-radius: 20px; background: #fff; }
+.empty-state { padding: 2rem; border-radius: 20px; background: #fff; color: var(--muted); text-align: center; }
+.animal-result[hidden] { display: none !important; }
 
 .feature-item i {
   width: 60px;
@@ -499,9 +545,13 @@ img {
     grid-template-columns: repeat(2, minmax(90px, 1fr));
   }
 
+  .marketplace-tools { grid-template-columns: 1fr; }
+
   .feature-strip,
   .featured-section,
   .story-section,
+  .how-section,
+  .calculator-section,
   .support-section,
   .dashboard-section,
   .page-hero {

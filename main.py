@@ -100,7 +100,7 @@ async def upload_file(file: UploadFile = File(...), folder: str = Form("uploads"
 
 @app.get("/")
 def home(request: Request, db: Session = Depends(get_db)):
-    featured_animals = db.query(Animal).limit(4).all()
+    featured_animals = db.query(Animal).filter(Animal.is_active.is_(True), Animal.is_available.is_(True)).limit(4).all()
     stats = {
         "animals": db.query(Animal).count(),
         "farms": db.query(Farm).count(),
@@ -109,12 +109,18 @@ def home(request: Request, db: Session = Depends(get_db)):
     }
     user = get_current_user(request, db)
     return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
+        request=request,
+        name="index.html",
+        context={
             "user": user,
             "featured_animals": featured_animals,
             "stats": stats,
+            "steps": [
+                ("01", "Choose an animal", "Browse listings and review the farm, animal details, and investment amount."),
+                ("02", "Invest with a farm", "Your investment is associated with an animal and held through the one-year lock period."),
+                ("03", "Follow its progress", "Farms record animal updates and birth events so you can follow activity over time."),
+                ("04", "Share offspring value", "Recorded offspring value is allocated 50% to the investor and 50% to the farm owner."),
+            ],
         },
     )
 
@@ -124,7 +130,7 @@ def login_page(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
     if user:
         return RedirectResponse("/dashboard", status_code=303)
-    return templates.TemplateResponse("login.html", {"request": request, "user": None, "error": None})
+    return templates.TemplateResponse(request=request, name="login.html", context={"user": None, "error": None})
 
 
 @app.post("/login")
@@ -137,8 +143,9 @@ def login_submit(
     user = get_user_by_email(db, email.strip())
     if not user or not verify_password(password, user.password_hash):
         return templates.TemplateResponse(
-            "login.html",
-            {"request": request, "user": None, "error": "Invalid email or password."},
+            request=request,
+            name="login.html",
+            context={"user": None, "error": "Invalid email or password."},
             status_code=401,
         )
 
@@ -153,7 +160,7 @@ def register_page(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
     if user:
         return RedirectResponse("/dashboard", status_code=303)
-    return templates.TemplateResponse("register.html", {"request": request, "user": None, "error": None})
+    return templates.TemplateResponse(request=request, name="register.html", context={"user": None, "error": None})
 
 
 @app.post("/register")
@@ -167,8 +174,9 @@ def register_submit(
     email = email.strip()
     if get_user_by_email(db, email):
         return templates.TemplateResponse(
-            "register.html",
-            {"request": request, "user": None, "error": "User with this email already exists."},
+            request=request,
+            name="register.html",
+            context={"user": None, "error": "User with this email already exists."},
             status_code=400,
         )
 
@@ -193,9 +201,9 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
     user_investments = db.query(Investment).filter(Investment.investor_id == user.id).all()
 
     return templates.TemplateResponse(
-        "dashboard.html",
-        {
-            "request": request,
+        request=request,
+        name="dashboard.html",
+        context={
             "user": user,
             "farms": user_farms,
             "animals": user_animals,
@@ -207,17 +215,18 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
 @app.get("/animals")
 def animals_page(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
-    animals = db.query(Animal).all()
+    animals = db.query(Animal).filter(Animal.is_active.is_(True), Animal.is_available.is_(True)).all()
     return templates.TemplateResponse(
-        "animals.html",
-        {"request": request, "user": user, "animals": animals},
+        request=request,
+        name="animals.html",
+        context={"user": user, "animals": animals},
     )
 
 
 @app.get("/support")
 def support_page(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
-    return templates.TemplateResponse("support.html", {"request": request, "user": user})
+    return templates.TemplateResponse(request=request, name="support.html", context={"user": user})
 
 
 @app.get("/api")

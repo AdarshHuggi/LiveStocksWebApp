@@ -14,7 +14,7 @@ Base = declarative_base()
 
 
 def init_db() -> None:
-    # Import all models here to ensure tables are created.
+    # Import all models here to ensure tables are created using the same model module.
     from models.models import Animal, BirthHistory, Farm, Investment, User
 
     Base.metadata.create_all(bind=engine)
