@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | LiveStocks{% endblock %}
+
+{% block content %}
+<section class="page-hero small-hero">
+  <div class="container">
+    <p class="eyebrow">Investor dashboard</p>
+    <h1>Welcome back, {{ user.full_name or user.email.split('@')[0] }}</h1>
+  </div>
+</section>
+
+<section class="dashboard-section">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="dashboard-card accent-green">
+          <span>Farms</span>
+          <h3>{{ farms|length }}</h3>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="dashboard-card accent-gold">
+          <span>Animals</span>
+          <h3>{{ animals|length }}</h3>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="dashboard-card accent-blue">
+          <span>Investments</span>
+          <h3>{{ investments|length }}</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mt-2">
+      <div class="col-lg-6">
+        <div class="panel-box">
+          <h4>Your farms</h4>
+          {% if farms %}
+            <ul class="list-group list-group-flush">
+              {% for farm in farms %}
+                <li class="list-group-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong>{{ farm.name }}</strong>
+                    <span class="badge bg-light text-dark">{{ farm.location }}</span>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted mt-3 mb-0">No farms added yet.</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="panel-box">
+          <h4>Your investments</h4>
+          {% if investments %}
+            <ul class="list-group list-group-flush">
+              {% for investment in investments %}
+                <li class="list-group-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span>Animal ID: {{ investment.animal_id }}</span>
+                    <strong>${{ '%.2f'|format(investment.amount_invested) }}</strong>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted mt-3 mb-0">No investments yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

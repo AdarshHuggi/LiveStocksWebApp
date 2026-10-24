@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}LiveStocks | Premium Farm Investing{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center min-vh-100 pt-5">
+      <div class="col-lg-6">
+        <p class="eyebrow">Invest in real farm potential</p>
+        <h1>Grow wealth with premium livestock and sustainable farms.</h1>
+        <p class="lead text-light-emphasis">Discover high-quality animals, transparent ownership, and profitable farming opportunities built for modern investors.</p>
+        <div class="d-flex flex-wrap gap-3 mt-4">
+          <a href="/animals" class="btn btn-primary btn-lg">Explore animals</a>
+          <a href="/register" class="btn btn-outline-light btn-lg">Create account</a>
+        </div>
+        <div class="hero-stats mt-5">
+          {% for key, value in stats.items() %}
+          <div class="stat-box">
+            <strong>{{ value }}</strong>
+            <span>{{ key|title }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="hero-card">
+          <div class="image-block">
+            <img src="https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=1200&q=80" alt="Healthy herd in a farm" />
+          </div>
+          <div class="floating-card">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>Portfolio value</span>
+              <span class="badge text-bg-success">+18.4%</span>
+            </div>
+            <h3>$248,500</h3>
+            <div class="mini-progress">
+              <span style="width: 78%"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="feature-strip">
+  <div class="container">
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="feature-item">
+          <i class="fa-solid fa-shield-heart"></i>
+          <h5>Transparent ownership</h5>
+          <p>Track each animal and every investment with clear reporting.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-item">
+          <i class="fa-solid fa-chart-line"></i>
+          <h5>Performance analytics</h5>
+          <p>Monitor profits, births, and growth in real time from your dashboard.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-item">
+          <i class="fa-solid fa-seedling"></i>
+          <h5>Sustainable farms</h5>
+          <p>Support ethical agriculture practices and long-term returns.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="featured-section">
+  <div class="container">
+    <div class="section-heading">
+      <p class="eyebrow text-primary">Featured livestock</p>
+      <h2>Premium animals with strong growth value.</h2>
+    </div>
+    <div class="row g-4">
+      {% for animal in featured_animals %}
+      <div class="col-lg-3 col-md-6">
+        <div class="animal-card">
+          <img src="https://images.unsplash.com/photo-1554284126-a5d0f3adca7f?auto=format&fit=crop&w=900&q=80" alt="{{ animal.name }}" />
+          <div class="animal-card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <h5>{{ animal.name }}</h5>
+              <span class="tag">{{ animal.animal_type|title }}</span>
+            </div>
+            <p class="meta">Tag #{{ animal.tag_number }} • {{ animal.gender|title }}</p>
+            <div class="price-row">
+              <span>Market value</span>
+              <strong>${{ '%.2f'|format(animal.market_value or 0) }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="story-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <img class="story-image" src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=80" alt="Farm landscape" />
+      </div>
+      <div class="col-lg-6">
+        <p class="eyebrow text-primary">Why choose us</p>
+        <h2>Built for investors who want results and trust.</h2>
+        <ul class="check-list">
+          <li>Curated animal selection across quality farms</li>
+          <li>Verified data, breeding records, and investment milestones</li>
+          <li>Secure, simple onboarding for new and seasoned investors</li>
+          <li>Dedicated support and portfolio guidance</li>
+        </ul>
+        <a href="/register" class="btn btn-primary mt-3">Start investing</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

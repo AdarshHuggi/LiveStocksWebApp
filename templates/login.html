@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Login | LiveStocks{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+  <div class="container">
+    <div class="auth-card row g-0">
+      <div class="col-lg-6 auth-visual d-none d-lg-block">
+        <div class="auth-image-wrap">
+          <img src="https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?auto=format&fit=crop&w=900&q=80" alt="Farm animals" />
+        </div>
+      </div>
+      <div class="col-lg-6 auth-form-wrap">
+        <div class="auth-form-box">
+          <p class="eyebrow text-primary">Welcome back</p>
+          <h2>Login to your account</h2>
+          {% if error %}
+            <div class="alert alert-danger mt-3">{{ error }}</div>
+          {% endif %}
+          <form method="post" action="/login">
+            <div class="mb-3">
+              <label for="email" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required />
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+          </form>
+          <p class="mt-4 mb-0 text-center small text-secondary">
+            Don’t have an account?
+            <a href="/register">Create one</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
